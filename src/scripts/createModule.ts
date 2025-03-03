@@ -1,6 +1,114 @@
 import fs from 'fs';
 import path from 'path';
 
+function generateInterface(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { Document, Model } from 'mongoose';
+
+
+// ${capitalizedModuleName} Schema Definition
+export interface I${capitalizedModuleName} extends Document {
+  name: string;
+  status: boolean;
+}
+
+export interface I${capitalizedModuleName}Methods {
+  getFullName(): string;
+}
+
+export type ${capitalizedModuleName}Model = Model<I${capitalizedModuleName}, Record<string, unknown>, I${capitalizedModuleName}Methods>;`;
+}
+
+function generateModel(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { Schema, model } from 'mongoose';
+import { I${capitalizedModuleName}, I${capitalizedModuleName}Methods, ${capitalizedModuleName}Model } from './${moduleName}.interface';
+
+const ${moduleName}Schema = new Schema<I${capitalizedModuleName}, ${capitalizedModuleName}Model, I${capitalizedModuleName}Methods>({
+  name: { type: String, required: true },
+  status: { type: Boolean, default: true },
+}, {
+  timestamps: true,
+});
+
+export const ${capitalizedModuleName} = model<I${capitalizedModuleName}, ${capitalizedModuleName}Model>('${capitalizedModuleName}', ${moduleName}Schema);`;
+}
+
+function generateRoutes(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { Router } from 'express';
+import { ${capitalizedModuleName}Controller } from './${moduleName}.controller';
+
+const router = Router();
+
+// Define routes
+router.post('/', ${capitalizedModuleName}Controller.handleCreate${capitalizedModuleName});
+
+export const ${moduleName}Routes = router;`;
+}
+
+function generateController(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { RequestHandler } from 'express';
+import { ${capitalizedModuleName}Service } from './${moduleName}.service';
+
+export const handleCreate${capitalizedModuleName}: RequestHandler = async (req, res, next) => {
+  try {
+    const data = await ${capitalizedModuleName}Service.create${capitalizedModuleName}(req.body);
+    res.status(201).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const ${capitalizedModuleName}Controller = {
+  handleCreate${capitalizedModuleName},
+};`;
+}
+
+function generateService(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { ${capitalizedModuleName} } from './${moduleName}.model';
+import { I${capitalizedModuleName} } from './${moduleName}.interface';
+const create${capitalizedModuleName} = (data: I${capitalizedModuleName}) => {
+    return ${capitalizedModuleName}.create(data);
+  }
+export const ${capitalizedModuleName}Service = {
+  create${capitalizedModuleName},
+};`;
+}
+
+function generateValidation(moduleName: string) {
+  const capitalizedModuleName = capitalize(moduleName);
+
+  return `import { z } from 'zod';
+
+export const create${capitalizedModuleName}ValidationSchema = z.object({
+  body: z.object({
+    name: z.string({
+      required_error: '${capitalizedModuleName} name is required',
+    }),
+    status: z.boolean().optional(),
+  }),
+});
+
+export const update${capitalizedModuleName}ValidationSchema = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    status: z.boolean().optional(),
+  }),
+});
+
+export const ${moduleName}Validation = {
+  create: create${capitalizedModuleName}ValidationSchema,
+  update: update${capitalizedModuleName}ValidationSchema,
+};`;
+}
 // Function to create a module with dynamic files
 const createModule = (moduleName: string): void => {
   const baseDir = path.join(__dirname, '../', 'app', 'modules', moduleName);
@@ -31,18 +139,18 @@ const createModule = (moduleName: string): void => {
 
       // Basic template for each file
       if (file.endsWith('.routes.ts')) {
-        content = `import { Router } from 'express';\nimport { ${moduleName}Controller } from './${moduleName}.controller';\n\nconst router = Router();\n\n// Define routes\nrouter.get('/', ${moduleName}Controller.getAll);\n\nexport default router;\n`;
+        content = generateRoutes(moduleName);
       } else if (file.endsWith('.controller.ts')) {
-        content = `import { Request, Response } from 'express';\nimport { ${moduleName}Service } from './${moduleName}.service';\n\nexport const ${moduleName}Controller = {\n  async getAll(req: Request, res: Response) {\n    const data = await ${moduleName}Service.getAll();\n    res.json(data);\n  },\n};\n`;
+        content = generateController(moduleName);
       } else if (file.endsWith('.service.ts')) {
-        content = `export const ${moduleName}Service = {\n  async getAll() {\n    // Example service logic\n    return [{ message: 'Service logic here' }];\n  },\n};\n`;
+        content = generateService(moduleName);
       } else if (file.endsWith('.interface.ts')) {
-        content = `export interface I${capitalize(moduleName)} {\n  id: string;\n  name: string;\n}\n`;
-      } else if (file.endsWith('.validation.ts')) {
-        content = `import { z } from 'zod';\n\nexport const ${moduleName}Validation = {\n  create: z.object({\n    name: z.string().min(1, 'Name is required'),\n  }),\n  update: z.object({\n    id: z.string().uuid('Invalid ID format'),\n    name: z.string().optional(),\n  }),\n};\n`;
+        content = generateInterface(moduleName);
       } else if (file.endsWith('.model.ts')) {
         // Template for the model.ts file
-        content = `import { Schema, model, Document } from 'mongoose';\n\nexport interface I${capitalize(moduleName)}Model extends Document {\n  name: string;\n  // add more fields here\n}\n\nconst ${moduleName}Schema = new Schema<I${capitalize(moduleName)}Model>({\n  name: { type: String, required: true },\n  // add more fields here\n});\n\nconst ${moduleName}Model = model<I${capitalize(moduleName)}Model>('${capitalize(moduleName)}', ${moduleName}Schema);\n\nexport default ${moduleName}Model;\n`;
+        content = generateModel(moduleName);
+      } else if (file.endsWith('.validation.ts')) {
+        content = generateValidation(moduleName);
       }
 
       fs.writeFileSync(filePath, content, 'utf-8');
