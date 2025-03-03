@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import os from 'os';
 import { routes } from './app/routes';
+import { globalErrorHandler } from './app/moddlewares/globalErrorHandler';
+import notFound from './app/moddlewares/notFound';
 
 const app = express();
 
@@ -38,5 +40,11 @@ app.get('/', (req: Request, res: Response) => {
     },
   });
 });
+
+// Handle Global Error
+app.use(globalErrorHandler);
+
+// Handle api not found
+app.use(notFound);
 
 export default app;

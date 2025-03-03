@@ -1,15 +1,15 @@
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 
-export const handleRegistration = async (req: Request, res: Response) => {
+export const handleRegistration: RequestHandler = async (req, res, next) => {
   try {
     const payload = req.body;
 
     res.json(payload);
   } catch (error) {
-    console.error(error);
+    next(error);
   }
 };
-export const handleLogin = async (req: Request, res: Response) => {
+export const handleLogin: RequestHandler = async (req, res) => {
   try {
     const payload = req.body;
 
