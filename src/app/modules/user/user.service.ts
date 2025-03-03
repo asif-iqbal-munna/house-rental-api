@@ -1,6 +1,10 @@
-export const userService = {
-  async getAll() {
-    // Example service logic
-    return [{ message: 'Service logic here' }];
-  },
+import { IUser } from './user.interface';
+import { User } from './user.model';
+
+const createUser = async (user: IUser) => {
+  return User.create(user);
+};
+
+export const UserService = {
+  createUser,
 };

@@ -19,8 +19,11 @@ export interface IUser extends Document {
   updatedAt: Date;
 }
 
-export interface IUserMethods {
-  fullName(): string;
+export interface UserModel extends Model<IUser> {
+  checkUserExistByEmail(email: string): Promise<IUser | null>;
+  checkUserExistById(id: string): Promise<IUser | null>;
+  isPasswordMatched(
+    givenPassword: string,
+    savedPassword: string,
+  ): Promise<boolean>;
 }
-
-export type UserModel = Model<IUser, Record<string, unknown>, IUserMethods>;

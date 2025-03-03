@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import os from 'os';
 import { routes } from './app/routes';
-import { globalErrorHandler } from './app/moddlewares/globalErrorHandler';
-import notFound from './app/moddlewares/notFound';
+import { globalErrorHandler } from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 
 const app = express();
 

@@ -1,10 +1,31 @@
 import { RequestHandler } from 'express';
+import { User } from '../user/user.model';
+import sendResponse from '../../libs/responseHandler';
+import { StatusCodes } from 'http-status-codes';
 
 export const handleRegistration: RequestHandler = async (req, res, next) => {
   try {
-    const payload = req.body;
+    const userExist = await User.checkUserExistByEmail(req.body.email);
 
-    res.json(payload);
+    if (userExist) {
+      return sendResponse(res, {
+        success: false,
+        statusCode: 400,
+        message: 'User already exist',
+      });
+    }
+
+    const response = {
+      accessToken: '',
+      refreshToken: '',
+    };
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.CREATED,
+      message: 'User created successfully',
+      data: response,
+    });
   } catch (error) {
     next(error);
   }
