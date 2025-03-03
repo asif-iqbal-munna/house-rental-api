@@ -58,7 +58,7 @@ import { ${capitalizedModuleName}Service } from './${moduleName}.service';
 
 export const handleCreate${capitalizedModuleName}: RequestHandler = async (req, res, next) => {
   try {
-    const data = await ${capitalizedModuleName}Service.create${capitalizedModuleName}(req.body);
+    const data = await ${capitalizedModuleName}Service.create${capitalizedModuleName}IntoDb(req.body);
     res.status(201).json(data);
   } catch (error) {
     next(error);
@@ -75,11 +75,11 @@ function generateService(moduleName: string) {
 
   return `import { ${capitalizedModuleName} } from './${moduleName}.model';
 import { I${capitalizedModuleName} } from './${moduleName}.interface';
-const create${capitalizedModuleName} = (data: I${capitalizedModuleName}) => {
+const create${capitalizedModuleName}IntoDb = (data: I${capitalizedModuleName}) => {
     return ${capitalizedModuleName}.create(data);
   }
 export const ${capitalizedModuleName}Service = {
-  create${capitalizedModuleName},
+  create${capitalizedModuleName}IntoDb,
 };`;
 }
 
