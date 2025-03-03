@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
 import { Server } from 'http';
+import seedAdmin from './app/DB/seed';
 
 let server: Server | null = null;
 
@@ -31,6 +32,7 @@ function gracefulShutdown(signal: string) {
 async function main() {
   try {
     await connectToDatabase();
+    await seedAdmin();
 
     server = app.listen(config.port, () => {
       console.log(`App listening on port ${config.port}`);
