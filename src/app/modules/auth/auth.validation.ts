@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { UserRole } from '../user/user.interface';
 
 export const userRegisterValidation = z.object({
   name: z.string({ required_error: 'Name is required' }),
@@ -8,4 +9,9 @@ export const userRegisterValidation = z.object({
   password: z
     .string({ required_error: 'Password is required' })
     .min(6, { message: 'Password must be at least 6 characters' }),
+  role: z
+    .enum([UserRole.TENANT, UserRole.LANDLORD], {
+      message: 'Invalid role value',
+    })
+    .default(UserRole.TENANT),
 });

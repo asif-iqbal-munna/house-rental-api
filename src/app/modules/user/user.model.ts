@@ -43,4 +43,8 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, Number(config.salt_round));
 });
 
+userSchema.pre('find', function () {
+  this.select('-password -__v');
+});
+
 export const User = model<IUser, UserModel>('User', userSchema);

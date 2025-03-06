@@ -6,3 +6,5 @@ export interface IApiResponse<T> {
   error?: unknown;
   stack?: unknown;
 }
+
+export type TQuery = Record<string, unknown>;
