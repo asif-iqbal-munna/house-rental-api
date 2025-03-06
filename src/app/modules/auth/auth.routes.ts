@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AuthController } from './auth.controller';
 import { validateResource } from '../../middlewares/validateRequest';
-import { userRegisterValidation } from './auth.validation';
+import { userLoginValidation, userRegisterValidation } from './auth.validation';
 
 const router = Router();
 
@@ -11,6 +11,10 @@ router.post(
   validateResource(userRegisterValidation),
   AuthController.handleRegistration,
 );
-router.post('/login', AuthController.handleLogin);
+router.post(
+  '/login',
+  validateResource(userLoginValidation),
+  AuthController.handleLogin,
+);
 
 export const authRoutes = router;
