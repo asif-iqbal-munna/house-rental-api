@@ -69,7 +69,7 @@ export const handleRegistration: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-export const handleLogin: RequestHandler = async (req, res) => {
+export const handleLogin: RequestHandler = async (req, res, next) => {
   try {
     const payload = req.body;
 
@@ -144,7 +144,7 @@ export const handleLogin: RequestHandler = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    console.error(error);
+    next(error);
   }
 };
 

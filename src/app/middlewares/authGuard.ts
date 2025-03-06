@@ -33,7 +33,6 @@ export const AuthGuard =
         token,
         config.access_token_secret as string,
       ) as JwtPayload;
-      console.log(decoded);
 
       if (!decoded) {
         return sendResponse(res, {
