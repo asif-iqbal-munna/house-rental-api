@@ -31,14 +31,20 @@ export const handleRegistration: RequestHandler = async (req, res, next) => {
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const { password, ...rest } = user.toObject();
 
+    const jwtPayload = {
+      _id: rest._id,
+      email: rest.email,
+      role: rest.role,
+    };
+
     const accessToken = generateToken(
-      rest,
+      jwtPayload,
       config.access_token_secret as string,
       config.access_token_expiry as string,
     );
 
     const refreshToken = generateToken(
-      rest,
+      jwtPayload,
       config.refresh_token_secret as string,
       config.refresh_token_expiry as string,
     );
@@ -47,6 +53,11 @@ export const handleRegistration: RequestHandler = async (req, res, next) => {
       accessToken,
       refreshToken,
     };
+
+    res.cookie('refreshToken', refreshToken, {
+      secure: config.NODE_ENV === 'production',
+      httpOnly: true,
+    });
 
     sendResponse(res, {
       success: true,
@@ -96,14 +107,21 @@ export const handleLogin: RequestHandler = async (req, res) => {
 
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const { password, ...rest } = user.toObject();
+
+    const jwtPayload = {
+      _id: rest._id,
+      email: rest.email,
+      role: rest.role,
+    };
+
     const accessToken = generateToken(
-      rest,
+      jwtPayload,
       config.access_token_secret as string,
       config.access_token_expiry as string,
     );
 
     const refreshToken = generateToken(
-      rest,
+      jwtPayload,
       config.refresh_token_secret as string,
       config.refresh_token_expiry as string,
     );
@@ -113,6 +131,11 @@ export const handleLogin: RequestHandler = async (req, res) => {
       accessToken,
       refreshToken,
     };
+
+    res.cookie('refreshToken', refreshToken, {
+      secure: config.NODE_ENV === 'production',
+      httpOnly: true,
+    });
 
     sendResponse(res, {
       success: true,

@@ -8,6 +8,8 @@ export enum UserRole {
   LANDLORD = 'landlord',
 }
 
+export type TUserRole = (typeof UserRole)[keyof typeof UserRole];
+
 // User Schema Definition
 export interface IUser extends Document {
   email: string;

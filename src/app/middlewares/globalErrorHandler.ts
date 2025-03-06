@@ -53,6 +53,14 @@ export const globalErrorHandler: ErrorRequestHandler = (
       stack: error.stack,
     });
   }
+  if (error.name === 'JsonWebTokenError')
+    return sendResponse(res, {
+      success: false,
+      statusCode: error?.statusCode || StatusCodes.UNAUTHORIZED,
+      message: error.message,
+      error,
+      stack: error.stack,
+    });
   return sendResponse(res, {
     success: false,
     statusCode: StatusCodes.INTERNAL_SERVER_ERROR,

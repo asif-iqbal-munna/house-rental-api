@@ -5,5 +5,10 @@ export const generateToken = (
   expiresIn: string,
 ) => jwt.sign(data, privateKey, { expiresIn } as jwt.SignOptions);
 
-export const verifyToken = (token: string, publicKey: string) =>
-  jwt.verify(token, publicKey);
+export const verifyToken = (token: string, publicKey: string) => {
+  try {
+    return jwt.verify(token, publicKey);
+  } catch {
+    return false;
+  }
+};
