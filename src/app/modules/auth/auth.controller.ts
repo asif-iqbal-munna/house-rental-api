@@ -95,7 +95,6 @@ export const handleLogin: RequestHandler = async (req, res, next) => {
       payload.password,
       user.password,
     );
-    console.log({ passwordMatch });
 
     if (!passwordMatch) {
       return sendResponse(res, {
